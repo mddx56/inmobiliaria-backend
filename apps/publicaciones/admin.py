@@ -1,3 +1,5 @@
 from django.contrib import admin
+from .models import TipoOferta, Anuncio
 
-# Register your models here.
+admin.site.register(TipoOferta)
+admin.site.register(Anuncio)

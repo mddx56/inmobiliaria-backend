@@ -23,6 +23,6 @@ envinmobiliaria/
 
 # Project database
 .secrets/
-.env
+
 *.sqlite3
 *.log

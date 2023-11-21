@@ -17,5 +17,5 @@ router.register("zonas", views.ZonaView)
 
 
 urlpatterns = [
-    path("prop/", include(router.urls)),
+    path("estate/", include(router.urls)),
 ]

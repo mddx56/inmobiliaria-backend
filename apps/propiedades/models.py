@@ -13,6 +13,9 @@ class TipoInmueble(models.Model):
     titulo = models.CharField(max_length=255, blank=True, null=True)
     descripcion = models.TextField(max_length=2400, blank=True, null=True)
 
+    def __str__(self) -> str:
+        return f"Nombre : {self.nombre}"
+
 
 class Caracteristica(models.Model):
     class Meta:
@@ -25,6 +28,41 @@ class Caracteristica(models.Model):
         TipoInmueble, related_name="tipo_inmueble_character", on_delete=models.CASCADE
     )
 
+    def __str__(self) -> str:
+        return f"Nombre : {self.nombre}, {self.tipo_inmueble.nombre}"
+
+
+class Ciudad(models.Model):
+    class Meta:
+        verbose_name = "Ciudad"
+        verbose_name_plural = "Ciudades"
+
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    nombre = models.CharField(max_length=250, null=False)
+    departamento = models.CharField(max_length=250, null=False)
+
+    def __str__(self) -> str:
+        return f"Nombre : {self.nombre}"
+
+
+class Zona(models.Model):
+    class Meta:
+        verbose_name = "Zona"
+        verbose_name_plural = "Zonas"
+
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    nombre = models.CharField(max_length=250, null=False)
+    descripcion = models.TextField(max_length=2400, blank=True, null=True)
+    created_at = models.DateTimeField(default=timezone.now)
+    updated_at = models.DateTimeField(auto_now=True)
+    # area = models.ForeignKey(Area, on_delete=models.CASCADE, related_name="area_zona")
+    ciudad = models.ForeignKey(
+        Ciudad, on_delete=models.CASCADE, related_name="ciudad_zona", null=True
+    )
+
+    def __str__(self) -> str:
+        return f"Nombre : {self.nombre}"
+
 
 class Inmueble(models.Model):
     class Meta:
@@ -34,20 +72,29 @@ class Inmueble(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     direccion = models.CharField(max_length=255, blank=True, null=True)
     codigo = models.CharField(max_length=255, blank=True, null=True)
-    oferta = models.DecimalField(max_digits=5, decimal_places=2)
-    precio = models.DecimalField(max_digits=5, decimal_places=2)
-    gastos_comunes = models.DecimalField(max_digits=5, decimal_places=2)
-    disposicon = models.CharField(blank=False)
+    oferta = models.DecimalField(max_digits=10, decimal_places=2, blank=True, null=True)
+    precio = models.DecimalField(max_digits=10, decimal_places=2)
+    gastos_comunes = models.DecimalField(
+        max_digits=10, decimal_places=2, blank=True, null=True, default=0
+    )
+    disposicion = models.CharField(blank=True, default="")
     created_at = models.DateTimeField(default=timezone.now)
     updated_at = models.DateTimeField(auto_now=True)
     caracteristica = models.ManyToManyField(Caracteristica)
     tipo_inmueble = models.ForeignKey(
         TipoInmueble, on_delete=models.CASCADE, related_name="tipo_inmueble"
     )
+    zona = models.ForeignKey(Zona, on_delete=models.CASCADE, null=True)
+
+    def __str__(self) -> str:
+        return f"Direccion : {self.direccion}, Tipo {self.tipo_inmueble.nombre} - {self.zona.nombre}"
 
 
 class Terreno(Inmueble):
     superficie = models.DecimalField(max_digits=10, decimal_places=2)
+
+    def __str__(self) -> str:
+        return f"Terreno : {self.id}"
 
 
 class Departamento(Inmueble):
@@ -60,6 +107,9 @@ class Departamento(Inmueble):
     piso = models.PositiveIntegerField(blank=True, default=0)
     cantidad_pisos = models.PositiveIntegerField(blank=True, default=0)
 
+    def __str__(self) -> str:
+        return f"Departamento : {self.id}"
+
 
 class Casa(Inmueble):
     superficie_construida = models.DecimalField(max_digits=10, decimal_places=2)
@@ -69,6 +119,9 @@ class Casa(Inmueble):
     banios = models.PositiveIntegerField(blank=True, default=0)
     parqueos = models.PositiveIntegerField(blank=True, default=0)
     plantas = models.PositiveIntegerField(blank=True, default=0)
+
+    def __str__(self) -> str:
+        return f"Casa : {self.id}"
 
 
 class Imagen(models.Model):
@@ -108,32 +161,6 @@ class Punto(models.Model):
     latitud = models.DecimalField(max_digits=9, decimal_places=6)
     longitud = models.DecimalField(max_digits=9, decimal_places=6)
     area = models.ForeignKey(Area, on_delete=models.CASCADE, related_name="area_puntos")
-
-
-class Ciudad(models.Model):
-    class Meta:
-        verbose_name = "Ciudad"
-        verbose_name_plural = "Ciudades"
-
-    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    nombre = models.CharField(max_length=250, null=False)
-    departamento = models.CharField(max_length=250, null=False)
-
-
-class Zona(models.Model):
-    class Meta:
-        verbose_name = "Zona"
-        verbose_name_plural = "Zonas"
-
-    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    nombre = models.CharField(max_length=250, null=False)
-    descripcion = models.TextField(max_length=2400, blank=True, null=True)
-    created_at = models.DateTimeField(default=timezone.now)
-    updated_at = models.DateTimeField(auto_now=True)
-    area = models.ForeignKey(Area, on_delete=models.CASCADE, related_name="area_zona")
-    ciudad = models.ForeignKey(
-        Ciudad, on_delete=models.CASCADE, related_name="ciudad_zona"
-    )
 
     # nAmbientes = models.PositiveIntegerField(default=0, blank=True)
     # nParqueos = models.PositiveIntegerField(default=0, blank=True)

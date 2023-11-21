@@ -13,7 +13,7 @@ from .models import (
     Zona,
 )
 
-admin.site.site_header = "Inmuebles"
+admin.site.site_header = "Inmuebles 🏡"
 admin.site.site_title = "Casas"
 admin.site.index_title = "Bienvenidos 🤠"
 
